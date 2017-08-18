@@ -9,6 +9,14 @@ class Coordinate {
         this.y = y;
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -33,5 +41,12 @@ class Coordinate {
                 "x=" + x +
                 ", y=" + y +
                 '}';
+    }
+
+    Double distTo(Coordinate goal) {
+        return Math.sqrt(
+                Math.pow(goal.x - this.x, 2) +
+                        Math.pow(goal.y - this.y, 2)
+        );
     }
 }

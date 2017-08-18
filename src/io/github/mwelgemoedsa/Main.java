@@ -1,27 +1,37 @@
 package io.github.mwelgemoedsa;
 
-import com.sun.org.apache.bcel.internal.generic.ObjectType;
-
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Dimension2D;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.awt.event.ActionListener;
 
 class Surface extends JPanel implements ActionListener {
 
-    private final int xsize;
-    private final int ysize;
+    private final int xSize;
+    private final int ySize;
     private final HashMap<Coordinate, Obstacle> obstaclesMap;
+    private final Algorithm algorithm;
+    private final Coordinate goal;
+    private final Coordinate start;
 
-    Surface(int xsize, int ysize) {
-        this.xsize = xsize;
-        this.ysize = ysize;
-        obstaclesMap = new HashMap<>();
+    Surface(int xSize, int ySize) {
+        this.xSize = xSize;
+        this.ySize = ySize;
+        this.obstaclesMap = new HashMap<>();
 
-        Timer timer = new Timer(3000, this);
+        this.start = new Coordinate(0, 0);
+        this.goal = new Coordinate(xSize-1, ySize-1);
+
+        this.algorithm = new Algorithm(this, start, goal);
+
+        this.fillMaze();
+
+        Timer timer = new Timer(500, this);
         timer.start();
     }
 
@@ -34,8 +44,8 @@ class Surface extends JPanel implements ActionListener {
         g.clearRect(0, 0, (int)size.getHeight(), (int)size.getHeight());
 
         //Calculate the maximum block size to fit all blocks in the panel
-        int yBlockPixels = (int)(size.getHeight() / this.ysize);
-        int xBlockPixels = (int)(size.getWidth() / this.xsize);
+        int yBlockPixels = (int)(size.getHeight() / this.ySize);
+        int xBlockPixels = (int)(size.getWidth() / this.xSize);
 
         //blocks must be square
         int blockPixels = xBlockPixels;
@@ -43,8 +53,8 @@ class Surface extends JPanel implements ActionListener {
             blockPixels = yBlockPixels;
         }
 
-        for (int x = 0; x < xsize; x++) {
-            for (int y = 0; y < ysize; y++) {
+        for (int x = 0; x < xSize; x++) {
+            for (int y = 0; y < ySize; y++) {
                 Coordinate here = new Coordinate(x, y);
 
                 int startX = x * blockPixels;
@@ -68,6 +78,40 @@ class Surface extends JPanel implements ActionListener {
                 }
             }
         }
+
+        for (Coordinate coordinate : algorithm.getVisitedList()) {
+            g2d.setColor(Color.YELLOW);
+            g2d.fillRect(coordinate.getX() * blockPixels, coordinate.getY()*blockPixels, blockPixels, blockPixels);
+        }
+
+        for (Coordinate coordinate : algorithm.getOpenList()) {
+            g2d.setColor(Color.BLUE);
+            g2d.fillRect(coordinate.getX() * blockPixels, coordinate.getY()*blockPixels, blockPixels, blockPixels);
+        }
+
+        g2d.setColor(Color.CYAN);
+        Coordinate current = algorithm.getCurrent();
+        g2d.fillRect(current.getX() * blockPixels, current.getY()*blockPixels, blockPixels, blockPixels);
+    }
+
+    AbstractList<Coordinate> getNeighbours(Coordinate coordinate) {
+        ArrayList<Coordinate> coordinates = new ArrayList<>();
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+                if (j != 0 || i != 0) {
+                    int newX = coordinate.getX() + i;
+                    int newY = coordinate.getY() + j;
+
+                    if (newX >= 0 && newX < this.xSize && newY >= 0 && newY < this.ySize) {
+                        Coordinate newCoordinate = new Coordinate(newX, newY);
+                        if (obstaclesMap.get(newCoordinate) != Obstacle.wall)
+                            coordinates.add(newCoordinate);
+                    }
+                }
+            }
+        }
+
+        return coordinates;
     }
 
     @Override
@@ -85,14 +129,15 @@ class Surface extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        this.fillMaze();
+        this.algorithm.step();
+        this.repaint();
     }
 
     void fillMaze() {
         clear();
 
-        for (int x = 0; x < xsize; x++) {
-            for (int y = 0; y < ysize; y++) {
+        for (int x = 0; x < xSize; x++) {
+            for (int y = 0; y < ySize; y++) {
                 addObstacle(x, y, Obstacle.nothing);
             }
         }
@@ -100,15 +145,13 @@ class Surface extends JPanel implements ActionListener {
         Random randomGenerator = new Random();
 
         for(int i = 0; i != 10; i++) {
-            int x = randomGenerator.nextInt(10);
-            int y = randomGenerator.nextInt(10);
+            int x = randomGenerator.nextInt(xSize);
+            int y = randomGenerator.nextInt(ySize);
             this.addObstacle(x, y, Obstacle.wall);
         }
 
-        this.addObstacle(0, 0, Obstacle.start);
-        this.addObstacle(xsize-1, ysize-1, Obstacle.goal);
-
-        this.repaint();
+        this.addObstacle(start.getX(), start.getY(), Obstacle.start);
+        this.addObstacle(goal.getX(), goal.getY(), Obstacle.goal);
     }
 
     private void clear() {
@@ -123,7 +166,7 @@ public class Main extends JFrame {
     }
 
     private void initUI() {
-        Surface mazeSurface = new Surface(10, 10);
+        Surface mazeSurface = new Surface(5, 5);
         add(mazeSurface);
 
         mazeSurface.fillMaze();
