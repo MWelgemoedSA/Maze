@@ -1,5 +1,8 @@
 package io.github.mwelgemoedsa;
 
 enum Obstacle {
-    wall
+    wall,
+    nothing,
+    start,
+    goal
 }

@@ -3,13 +3,14 @@ package io.github.mwelgemoedsa;
 import com.sun.org.apache.bcel.internal.generic.ObjectType;
 
 import java.awt.*;
-import javax.swing.JFrame;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Dimension2D;
 import java.util.HashMap;
 import java.util.Random;
-import javax.swing.JPanel;
+import java.awt.event.ActionListener;
 
-class Surface extends JPanel {
+class Surface extends JPanel implements ActionListener {
 
     private final int xsize;
     private final int ysize;
@@ -18,15 +19,19 @@ class Surface extends JPanel {
     Surface(int xsize, int ysize) {
         this.xsize = xsize;
         this.ysize = ysize;
-        obstaclesMap = new HashMap<Coordinate,Obstacle>();
+        obstaclesMap = new HashMap<>();
+
+        Timer timer = new Timer(3000, this);
+        timer.start();
     }
 
     private void doDrawing(Graphics g) {
 
         Graphics2D g2d = (Graphics2D) g;
 
-
         Dimension2D size = this.getSize();
+
+        g.clearRect(0, 0, (int)size.getHeight(), (int)size.getHeight());
 
         //Calculate the maximum block size to fit all blocks in the panel
         int yBlockPixels = (int)(size.getHeight() / this.ysize);
@@ -42,13 +47,25 @@ class Surface extends JPanel {
             for (int y = 0; y < ysize; y++) {
                 Coordinate here = new Coordinate(x, y);
 
-                int startx = x * blockPixels;
-                int starty = y * blockPixels;
-                if (obstaclesMap.containsKey(here)) {
-                    g2d.fillRect(startx, starty, blockPixels, blockPixels);
-                } else {
-                g2d.drawRect(startx, starty, blockPixels-1, blockPixels-1);
-            }
+                int startX = x * blockPixels;
+                int startY = y * blockPixels;
+
+                Obstacle obstacle = obstaclesMap.get(here);
+                if (obstacle != null) {
+                    if (obstacle == Obstacle.wall) {
+                        g2d.setColor(Color.BLACK);
+                        g2d.fillRect(startX, startY, blockPixels, blockPixels);
+                    } else if (obstacle == Obstacle.start) {
+                        g2d.setColor(Color.RED);
+                        g2d.fillRect(startX, startY, blockPixels, blockPixels);
+                    } else if (obstacle == Obstacle.goal) {
+                        g2d.setColor(Color.GREEN);
+                        g2d.fillRect(startX, startY, blockPixels, blockPixels);
+                    }
+
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawRect(startX, startY, blockPixels, blockPixels);
+                }
             }
         }
     }
@@ -60,16 +77,48 @@ class Surface extends JPanel {
         doDrawing(g);
     }
 
-    void addObstacle(int x, int y, Obstacle obstacle) {
+    private void addObstacle(int x, int y, Obstacle obstacle) {
         Coordinate coordinate = new Coordinate(x, y);
         System.out.println("New obstacle " + coordinate.toString());
-        obstaclesMap.put(coordinate, Obstacle.wall);
+        obstaclesMap.put(coordinate, obstacle);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent actionEvent) {
+        this.fillMaze();
+    }
+
+    void fillMaze() {
+        clear();
+
+        for (int x = 0; x < xsize; x++) {
+            for (int y = 0; y < ysize; y++) {
+                addObstacle(x, y, Obstacle.nothing);
+            }
+        }
+
+        Random randomGenerator = new Random();
+
+        for(int i = 0; i != 10; i++) {
+            int x = randomGenerator.nextInt(10);
+            int y = randomGenerator.nextInt(10);
+            this.addObstacle(x, y, Obstacle.wall);
+        }
+
+        this.addObstacle(0, 0, Obstacle.start);
+        this.addObstacle(xsize-1, ysize-1, Obstacle.goal);
+
+        this.repaint();
+    }
+
+    private void clear() {
+        obstaclesMap.clear();
     }
 }
 
 public class Main extends JFrame {
 
-    Main() {
+    private Main() {
         initUI();
     }
 
@@ -77,14 +126,7 @@ public class Main extends JFrame {
         Surface mazeSurface = new Surface(10, 10);
         add(mazeSurface);
 
-        Random randomGenerator = new Random();
-
-        for(int i = 0; i != 10; i++) {
-            int x = randomGenerator.nextInt(10);
-            int y = randomGenerator.nextInt(10);
-            mazeSurface.addObstacle(x, y, Obstacle.wall);
-        }
-
+        mazeSurface.fillMaze();
 
         setTitle("Maze drawer");
         setSize(300, 300);
@@ -94,13 +136,9 @@ public class Main extends JFrame {
 
     public static void main(String[] args) {
 
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                Main ex = new Main();
-                ex.setVisible(true);
-            }
+        EventQueue.invokeLater(() -> {
+            Main ex = new Main();
+            ex.setVisible(true);
         });
     }
 }
