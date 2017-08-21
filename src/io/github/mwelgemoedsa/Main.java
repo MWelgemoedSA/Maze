@@ -13,26 +13,30 @@ import java.awt.event.ActionListener;
 class Surface extends JPanel implements ActionListener {
 
     private final int xSize;
+
+    public int getxSize() {
+        return xSize;
+    }
+
+    public int getySize() {
+        return ySize;
+    }
+
     private final int ySize;
     private final HashMap<Coordinate, Obstacle> obstaclesMap;
-    private final Algorithm algorithm;
-    private final Coordinate goal;
-    private final Coordinate start;
+    private final Timer tickTimer;
+
+    private Algorithm algorithm;
 
     Surface(int xSize, int ySize) {
         this.xSize = xSize;
         this.ySize = ySize;
         this.obstaclesMap = new HashMap<>();
 
-        this.start = new Coordinate(0, 0);
-        this.goal = new Coordinate(xSize-1, ySize-1);
-
-        this.algorithm = new Algorithm(this, start, goal);
-
         this.fillMaze();
 
-        Timer timer = new Timer(500, this);
-        timer.start();
+        tickTimer = new Timer(150, this);
+        //timer.start();
     }
 
     private void doDrawing(Graphics g) {
@@ -65,12 +69,6 @@ class Surface extends JPanel implements ActionListener {
                     if (obstacle == Obstacle.wall) {
                         g2d.setColor(Color.BLACK);
                         g2d.fillRect(startX, startY, blockPixels, blockPixels);
-                    } else if (obstacle == Obstacle.start) {
-                        g2d.setColor(Color.RED);
-                        g2d.fillRect(startX, startY, blockPixels, blockPixels);
-                    } else if (obstacle == Obstacle.goal) {
-                        g2d.setColor(Color.GREEN);
-                        g2d.fillRect(startX, startY, blockPixels, blockPixels);
                     }
 
                     g2d.setColor(Color.BLACK);
@@ -92,6 +90,10 @@ class Surface extends JPanel implements ActionListener {
         g2d.setColor(Color.CYAN);
         Coordinate current = algorithm.getCurrent();
         g2d.fillRect(current.getX() * blockPixels, current.getY()*blockPixels, blockPixels, blockPixels);
+
+        g2d.setColor(Color.GREEN);
+        Coordinate goal = algorithm.getGoal();
+        g2d.fillRect(goal.getX() * blockPixels, goal.getY()*blockPixels, blockPixels, blockPixels);
     }
 
     AbstractList<Coordinate> getNeighbours(Coordinate coordinate) {
@@ -129,6 +131,16 @@ class Surface extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
+        this.step();
+    }
+
+    public void setAlgorithm(Algorithm algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    public void step() {
+        if (this.algorithm == null) return;
+
         this.algorithm.step();
         this.repaint();
     }
@@ -144,37 +156,78 @@ class Surface extends JPanel implements ActionListener {
 
         Random randomGenerator = new Random();
 
-        for(int i = 0; i != 10; i++) {
+        for(int i = 0; i != 300; i++) {
             int x = randomGenerator.nextInt(xSize);
             int y = randomGenerator.nextInt(ySize);
             this.addObstacle(x, y, Obstacle.wall);
         }
-
-        this.addObstacle(start.getX(), start.getY(), Obstacle.start);
-        this.addObstacle(goal.getX(), goal.getY(), Obstacle.goal);
     }
 
     private void clear() {
         obstaclesMap.clear();
     }
+
+    public void startTimer() {
+        tickTimer.start();
+    }
+
+    public String[] getAlgorithms() {
+        return new String[]{"Greedy Search", "Depth First Search", "Breadth First Search"};
+    }
 }
 
-public class Main extends JFrame {
+public class Main extends JFrame implements ActionListener {
+    private Surface mazeSurface;
+    private JPanel ctrls;
 
     private Main() {
         initUI();
     }
 
     private void initUI() {
-        Surface mazeSurface = new Surface(5, 5);
+        mazeSurface = new Surface(25, 25);
+        //mazeSurface.setPreferredSize(new Dimension(500, 500));
         add(mazeSurface);
 
         mazeSurface.fillMaze();
 
         setTitle("Maze drawer");
-        setSize(300, 300);
+        setSize(600, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        ctrls = new JPanel();
+        ctrls.setLayout(new BoxLayout(ctrls, BoxLayout.PAGE_AXIS));
+        addButton("Start");
+        addButton("Step");
+
+        add(ctrls, BorderLayout.LINE_END);
+
+        boolean first = true;
+        ButtonGroup algorithmGroup = new ButtonGroup();
+        for (String algorithmStr : mazeSurface.getAlgorithms()) {
+            JRadioButton algorithmRadioButton = new JRadioButton(algorithmStr);
+            algorithmGroup.add(algorithmRadioButton);
+            algorithmRadioButton.addActionListener(this);
+            ctrls.add(algorithmRadioButton);
+            if (first) {
+                first = false;
+                algorithmRadioButton.setSelected(true);
+                setAlgorithm(algorithmStr);
+            }
+        }
+    }
+
+    private void setAlgorithm(String algorithmStr) {
+        System.out.println("New algorithm " + algorithmStr);
+        Algorithm algorithm = new Algorithm(mazeSurface, new Coordinate(0, 0), new Coordinate(mazeSurface.getxSize()-1, mazeSurface.getySize()-1));
+        mazeSurface.setAlgorithm(algorithm);
+    }
+
+    private void addButton(String text) {
+        JButton btnNew = new JButton(text);
+        ctrls.add(btnNew);
+        btnNew.addActionListener(this);
     }
 
     public static void main(String[] args) {
@@ -184,4 +237,20 @@ public class Main extends JFrame {
             ex.setVisible(true);
         });
     }
+
+    @Override
+    public void actionPerformed(ActionEvent actionEvent) {
+        System.out.println(actionEvent);
+        if (actionEvent.getActionCommand().equals("Start")) {
+            mazeSurface.startTimer();
+        }
+        if (actionEvent.getActionCommand().equals("Step")) {
+            mazeSurface.step();
+        }
+
+        if (actionEvent.getSource() instanceof JRadioButton) {
+            JRadioButton source = (JRadioButton)actionEvent.getSource();
+            setAlgorithm(source.getText());
+        }
+     }
 }

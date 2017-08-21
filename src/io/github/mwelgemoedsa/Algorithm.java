@@ -5,6 +5,7 @@ import java.util.Collections;
 
 class Algorithm {
     private final Coordinate goal;
+
     private Surface surface;
     private ArrayList<Coordinate> openList;
     private ArrayList<Coordinate> visitedList;
@@ -52,5 +53,9 @@ class Algorithm {
 
     public ArrayList<Coordinate> getVisitedList() {
         return visitedList;
+    }
+
+    public Coordinate getGoal() {
+        return goal;
     }
 }
