@@ -3,15 +3,15 @@ package io.github.mwelgemoedsa;
 import java.util.ArrayList;
 import java.util.Collections;
 
-class Algorithm {
+abstract class PathfindingAlgorithm {
     private final Coordinate goal;
 
     private Surface surface;
-    private ArrayList<Coordinate> openList;
+    protected ArrayList<Coordinate> openList;
     private ArrayList<Coordinate> visitedList;
     private Coordinate current;
 
-    Algorithm(Surface surface, Coordinate start, Coordinate goal) {
+    PathfindingAlgorithm(Surface surface, Coordinate start, Coordinate goal) {
         this.goal = goal;
 
         this.surface = surface;
@@ -29,8 +29,7 @@ class Algorithm {
         if (current.equals(goal)) return; //Nothing more to do
         if (openList.isEmpty()) return; //Also nothing to do, unable to find it
 
-        //DFS
-        Collections.sort(openList, (p1, p2) -> p1.distTo(goal).compareTo(p2.distTo(goal)));
+        this.sortOpenList();
 
         current = openList.remove(0);
 
@@ -42,10 +41,13 @@ class Algorithm {
                     current = coordinate;
                     return;
                 }
-                openList.add(coordinate);
+                this.addNode(coordinate);
             }
         }
     }
+
+    abstract void addNode(Coordinate coordinate);
+    abstract void sortOpenList();
 
     public ArrayList<Coordinate> getOpenList() {
         return openList;

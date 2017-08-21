@@ -26,7 +26,7 @@ class Surface extends JPanel implements ActionListener {
     private final HashMap<Coordinate, Obstacle> obstaclesMap;
     private final Timer tickTimer;
 
-    private Algorithm algorithm;
+    private PathfindingAlgorithm algorithm;
 
     Surface(int xSize, int ySize) {
         this.xSize = xSize;
@@ -134,7 +134,7 @@ class Surface extends JPanel implements ActionListener {
         this.step();
     }
 
-    public void setAlgorithm(Algorithm algorithm) {
+    public void setAlgorithm(PathfindingAlgorithm algorithm) {
         this.algorithm = algorithm;
     }
 
@@ -170,10 +170,6 @@ class Surface extends JPanel implements ActionListener {
     public void startTimer() {
         tickTimer.start();
     }
-
-    public String[] getAlgorithms() {
-        return new String[]{"Greedy Search", "Depth First Search", "Breadth First Search"};
-    }
 }
 
 public class Main extends JFrame implements ActionListener {
@@ -205,7 +201,7 @@ public class Main extends JFrame implements ActionListener {
 
         boolean first = true;
         ButtonGroup algorithmGroup = new ButtonGroup();
-        for (String algorithmStr : mazeSurface.getAlgorithms()) {
+        for (String algorithmStr : getAlgorithms()) {
             JRadioButton algorithmRadioButton = new JRadioButton(algorithmStr);
             algorithmGroup.add(algorithmRadioButton);
             algorithmRadioButton.addActionListener(this);
@@ -216,12 +212,6 @@ public class Main extends JFrame implements ActionListener {
                 setAlgorithm(algorithmStr);
             }
         }
-    }
-
-    private void setAlgorithm(String algorithmStr) {
-        System.out.println("New algorithm " + algorithmStr);
-        Algorithm algorithm = new Algorithm(mazeSurface, new Coordinate(0, 0), new Coordinate(mazeSurface.getxSize()-1, mazeSurface.getySize()-1));
-        mazeSurface.setAlgorithm(algorithm);
     }
 
     private void addButton(String text) {
@@ -253,4 +243,28 @@ public class Main extends JFrame implements ActionListener {
             setAlgorithm(source.getText());
         }
      }
+
+    public String[] getAlgorithms() {
+        return new String[]{"Greedy Search", "Depth First Search", "Breadth First Search"};
+    }
+
+    private void setAlgorithm(String algorithmStr) {
+        System.out.println("New algorithm " + algorithmStr);
+
+        Coordinate start = new Coordinate(0, 0);
+        Coordinate goal = new Coordinate(mazeSurface.getxSize()-1, mazeSurface.getySize()-1);
+
+        PathfindingAlgorithm algorithm = null;
+        if (algorithmStr.equals("Greedy Search")) {
+            algorithm = new GreedySearch(mazeSurface, start, goal);
+        } else if (algorithmStr.equals("Depth First Search")) {
+            algorithm = new DepthFirstSearch(mazeSurface, start, goal);
+        } else if (algorithmStr.equals("Breadth First Search")) {
+            algorithm = new BreadthFirstSearch(mazeSurface, start, goal);
+        }
+
+        mazeSurface.setAlgorithm(algorithm);
+    }
+
+
 }
