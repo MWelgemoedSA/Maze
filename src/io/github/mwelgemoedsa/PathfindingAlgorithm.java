@@ -26,8 +26,8 @@ abstract class PathfindingAlgorithm {
         return start.distTo(goal);
     }
 
-    Coordinate getCurrent() {
-        return current.getCoordinate();
+    GraphNode getCurrent() {
+        return current;
     }
 
     void step() {

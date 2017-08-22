@@ -92,8 +92,17 @@ class Surface extends JPanel implements ActionListener {
             g2d.fillRect(coordinate.getX() * blockPixels, coordinate.getY()*blockPixels, blockPixels, blockPixels);
         }
 
-        g2d.setColor(Color.CYAN);
-        Coordinate current = algorithm.getCurrent();
+        GraphNode currentNode = algorithm.getCurrent();
+        while (currentNode != null) {
+            Coordinate current = currentNode.getCoordinate();
+            g2d.setColor(Color.CYAN);
+            g2d.fillRect(current.getX() * blockPixels, current.getY()*blockPixels, blockPixels, blockPixels);
+
+            currentNode = currentNode.getPrevious();
+        }
+
+        g2d.setColor(Color.RED);
+        Coordinate current = algorithm.getCurrent().getCoordinate();
         g2d.fillRect(current.getX() * blockPixels, current.getY()*blockPixels, blockPixels, blockPixels);
 
         g2d.setColor(Color.GREEN);

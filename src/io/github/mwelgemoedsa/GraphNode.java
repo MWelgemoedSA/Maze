@@ -39,4 +39,8 @@ public class GraphNode {
     public Double getHeuristicAtNode() {
         return heuristicAtNode;
     }
+
+    public GraphNode getPrevious() {
+        return previous;
+    }
 }
