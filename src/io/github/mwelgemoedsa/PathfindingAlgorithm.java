@@ -32,22 +32,22 @@ abstract class PathfindingAlgorithm {
 
     void step() {
         if (current.getCoordinate().equals(goal)) return; //Nothing more to do
+
         if (openList.isEmpty()) return; //Also nothing to do, unable to find it
 
         this.sortOpenList();
 
         current = openList.remove(0);
 
+        if (current.getCoordinate().equals(goal)) { //We found it
+            return;
+        }
+
         visitedList.add(current);
 
         for (Coordinate coordinate : surface.getNeighbours(current.getCoordinate())) {
             double stepSize = coordinate.distTo(current.getCoordinate());
             GraphNode node = new GraphNode(coordinate, current.getTotalCost() + stepSize, heuristicValue(coordinate), current);
-
-            if (coordinate.equals(goal)) { //We found it
-                current = node;
-                return;
-            }
 
             if (!visitedList.contains(node) && !openList.contains(node)) {
                 this.addNode(node);

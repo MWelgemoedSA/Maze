@@ -44,10 +44,51 @@ class Surface extends JPanel implements ActionListener {
     private void doDrawing(Graphics g) {
 
         Graphics2D g2d = (Graphics2D) g;
-
         Dimension2D size = this.getSize();
+        g2d.clearRect(0, 0, (int)size.getWidth(), (int)size.getHeight());
 
-        g.clearRect(0, 0, (int)size.getHeight(), (int)size.getHeight());
+        for (int x = 0; x < xSize; x++) {
+            for (int y = 0; y < ySize; y++) {
+                Coordinate here = new Coordinate(x, y);
+
+                Obstacle obstacle = obstaclesMap.get(here);
+
+                if (obstacle == Obstacle.wall) {
+                    drawBlock(g2d, x, y, Color.BLACK);
+                } else {
+                    drawBlock(g2d, x, y, null);
+                }
+            }
+        }
+
+        Coordinate goal = algorithm.getGoal();
+        drawBlock(g2d, goal.getX(), goal.getY(), Color.GREEN);
+
+        for (GraphNode node: algorithm.getVisitedList()) {
+            Coordinate coordinate = node.getCoordinate();
+            drawBlock(g2d, coordinate.getX(), coordinate.getY(), Color.BLUE);
+        }
+
+        for (GraphNode node: algorithm.getOpenList()) {
+            Coordinate coordinate = node.getCoordinate();
+            drawBlock(g2d, coordinate.getX(), coordinate.getY(), Color.CYAN);
+        }
+
+        GraphNode currentNode = algorithm.getCurrent();
+        while (currentNode != null) {
+            Coordinate coordinate = currentNode.getCoordinate();
+            drawBlock(g2d, coordinate.getX(), coordinate.getY(), Color.YELLOW);
+
+            currentNode = currentNode.getPrevious();
+        }
+
+        Coordinate coordinate = algorithm.getCurrent().getCoordinate();
+        drawBlock(g2d, coordinate.getX(), coordinate.getY(), Color.RED);
+    }
+
+    //If fillColour is null just draw the outlines
+    void drawBlock(Graphics2D g2d, int x, int y, Color fillColour) {
+        Dimension2D size = this.getSize();
 
         //Calculate the maximum block size to fit all blocks in the panel
         int yBlockPixels = (int)(size.getHeight() / this.ySize);
@@ -59,55 +100,17 @@ class Surface extends JPanel implements ActionListener {
             blockPixels = yBlockPixels;
         }
 
-        for (int x = 0; x < xSize; x++) {
-            for (int y = 0; y < ySize; y++) {
-                Coordinate here = new Coordinate(x, y);
+        //Calculate square start point
+        int startX = x * blockPixels;
+        int startY = y * blockPixels;
 
-                int startX = x * blockPixels;
-                int startY = y * blockPixels;
+        g2d.setColor(Color.BLACK);
+        g2d.drawRect(startX, startY, blockPixels, blockPixels);
 
-                Obstacle obstacle = obstaclesMap.get(here);
-                if (obstacle != null) {
-                    if (obstacle == Obstacle.wall) {
-                        g2d.setColor(Color.BLACK);
-                        g2d.fillRect(startX, startY, blockPixels, blockPixels);
-                    }
-
-                    g2d.setColor(Color.BLACK);
-                    g2d.drawRect(startX, startY, blockPixels, blockPixels);
-                }
-            }
+        if (fillColour != null) {
+            g2d.setColor(fillColour);
+            g2d.fillRect(startX+1, startY+1, blockPixels-1, blockPixels-1);
         }
-
-        for (GraphNode node: algorithm.getVisitedList()) {
-            Coordinate coordinate = node.getCoordinate();
-            g2d.setColor(Color.YELLOW);
-            g2d.fillRect(coordinate.getX() * blockPixels, coordinate.getY()*blockPixels, blockPixels, blockPixels);
-        }
-
-        for (GraphNode node: algorithm.getOpenList()) {
-            Coordinate coordinate = node.getCoordinate();
-
-            g2d.setColor(Color.BLUE);
-            g2d.fillRect(coordinate.getX() * blockPixels, coordinate.getY()*blockPixels, blockPixels, blockPixels);
-        }
-
-        GraphNode currentNode = algorithm.getCurrent();
-        while (currentNode != null) {
-            Coordinate current = currentNode.getCoordinate();
-            g2d.setColor(Color.CYAN);
-            g2d.fillRect(current.getX() * blockPixels, current.getY()*blockPixels, blockPixels, blockPixels);
-
-            currentNode = currentNode.getPrevious();
-        }
-
-        g2d.setColor(Color.RED);
-        Coordinate current = algorithm.getCurrent().getCoordinate();
-        g2d.fillRect(current.getX() * blockPixels, current.getY()*blockPixels, blockPixels, blockPixels);
-
-        g2d.setColor(Color.GREEN);
-        Coordinate goal = algorithm.getGoal();
-        g2d.fillRect(goal.getX() * blockPixels, goal.getY()*blockPixels, blockPixels, blockPixels);
     }
 
     AbstractList<Coordinate> getNeighbours(Coordinate coordinate) {
@@ -150,6 +153,7 @@ class Surface extends JPanel implements ActionListener {
 
     public void setAlgorithm(PathfindingAlgorithm algorithm) {
         this.algorithm = algorithm;
+        obstaclesMap.remove(algorithm.getGoal());
     }
 
     public void step() {
