@@ -1,5 +1,7 @@
 package io.github.mwelgemoedsa;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
+
 import java.util.Collections;
 
 public class GreedySearch extends PathfindingAlgorithm {
@@ -8,13 +10,12 @@ public class GreedySearch extends PathfindingAlgorithm {
     }
 
     @Override
-    void addNode(Coordinate coordinate) {
-        openList.add(coordinate);
+    void addNode(GraphNode node) {
+        openList.add(node);
     }
 
     @Override
     void sortOpenList() {
-        Coordinate goal = this.getGoal();
-        Collections.sort(openList, (p1, p2) -> p1.distTo(goal).compareTo(p2.distTo(goal)));
+        Collections.sort(openList, (p1, p2) -> p1.getHeuristicAtNode().compareTo(p2.getHeuristicAtNode()));
     } //Take the node with the best heuristic
 }

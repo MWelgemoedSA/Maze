@@ -6,8 +6,8 @@ public class DepthFirstSearch extends PathfindingAlgorithm {
     }
 
     @Override
-    void addNode(Coordinate coordinate) {
-        openList.add(0, coordinate);
+    void addNode(GraphNode node) {
+        openList.add(0, node);
     } //Adding node at the start of the open list makes it a depth first search
 
     @Override

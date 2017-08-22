@@ -1,15 +1,16 @@
 package io.github.mwelgemoedsa;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
+
 import java.util.ArrayList;
-import java.util.Collections;
 
 abstract class PathfindingAlgorithm {
     private final Coordinate goal;
 
     private Surface surface;
-    protected ArrayList<Coordinate> openList;
-    private ArrayList<Coordinate> visitedList;
-    private Coordinate current;
+    ArrayList<GraphNode> openList;
+    private ArrayList<GraphNode> visitedList;
+    private GraphNode current;
 
     PathfindingAlgorithm(Surface surface, Coordinate start, Coordinate goal) {
         this.goal = goal;
@@ -17,16 +18,20 @@ abstract class PathfindingAlgorithm {
         this.surface = surface;
         this.openList = new ArrayList<>();
         this.visitedList = new ArrayList<>();
-        this.openList.add(start);
-        this.current = start;
+        this.current = new GraphNode(start, 0, heuristicValue(start), null);
+        this.openList.add(this.current);
+    }
+
+    private double heuristicValue(Coordinate start) {
+        return start.distTo(goal);
     }
 
     Coordinate getCurrent() {
-        return current;
+        return current.getCoordinate();
     }
 
     void step() {
-        if (current.equals(goal)) return; //Nothing more to do
+        if (current.getCoordinate().equals(goal)) return; //Nothing more to do
         if (openList.isEmpty()) return; //Also nothing to do, unable to find it
 
         this.sortOpenList();
@@ -35,29 +40,33 @@ abstract class PathfindingAlgorithm {
 
         visitedList.add(current);
 
-        for (Coordinate coordinate : surface.getNeighbours(current)) {
-            if (!visitedList.contains(coordinate) && !openList.contains(coordinate)) {
-                if (coordinate.equals(goal)) { //We found it
-                    current = coordinate;
-                    return;
-                }
-                this.addNode(coordinate);
+        for (Coordinate coordinate : surface.getNeighbours(current.getCoordinate())) {
+            double stepSize = coordinate.distTo(current.getCoordinate());
+            GraphNode node = new GraphNode(coordinate, current.getTotalCost() + stepSize, heuristicValue(coordinate), current);
+
+            if (coordinate.equals(goal)) { //We found it
+                current = node;
+                return;
+            }
+
+            if (!visitedList.contains(node) && !openList.contains(node)) {
+                this.addNode(node);
             }
         }
     }
 
-    abstract void addNode(Coordinate coordinate);
+    abstract void addNode(GraphNode node);
     abstract void sortOpenList();
 
-    public ArrayList<Coordinate> getOpenList() {
+    ArrayList<GraphNode> getOpenList() {
         return openList;
     }
 
-    public ArrayList<Coordinate> getVisitedList() {
+    ArrayList<GraphNode> getVisitedList() {
         return visitedList;
     }
 
-    public Coordinate getGoal() {
+    Coordinate getGoal() {
         return goal;
     }
 }

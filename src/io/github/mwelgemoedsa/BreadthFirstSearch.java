@@ -8,8 +8,8 @@ public class BreadthFirstSearch extends PathfindingAlgorithm {
     }
 
     //Adding a node at the end of the open list makes it breadth first search
-    void addNode(Coordinate coordinate) {
-        this.openList.add(coordinate);
+    void addNode(GraphNode node) {
+        this.openList.add(node);
     }
 
     //No heuristic

@@ -1,5 +1,7 @@
 package io.github.mwelgemoedsa;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
+
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -77,12 +79,15 @@ class Surface extends JPanel implements ActionListener {
             }
         }
 
-        for (Coordinate coordinate : algorithm.getVisitedList()) {
+        for (GraphNode node: algorithm.getVisitedList()) {
+            Coordinate coordinate = node.getCoordinate();
             g2d.setColor(Color.YELLOW);
             g2d.fillRect(coordinate.getX() * blockPixels, coordinate.getY()*blockPixels, blockPixels, blockPixels);
         }
 
-        for (Coordinate coordinate : algorithm.getOpenList()) {
+        for (GraphNode node: algorithm.getOpenList()) {
+            Coordinate coordinate = node.getCoordinate();
+
             g2d.setColor(Color.BLUE);
             g2d.fillRect(coordinate.getX() * blockPixels, coordinate.getY()*blockPixels, blockPixels, blockPixels);
         }
@@ -245,7 +250,7 @@ public class Main extends JFrame implements ActionListener {
      }
 
     public String[] getAlgorithms() {
-        return new String[]{"Greedy Search", "Depth First Search", "Breadth First Search"};
+        return new String[]{"A*", "Greedy Search", "Depth First Search", "Breadth First Search"};
     }
 
     private void setAlgorithm(String algorithmStr) {
@@ -261,6 +266,8 @@ public class Main extends JFrame implements ActionListener {
             algorithm = new DepthFirstSearch(mazeSurface, start, goal);
         } else if (algorithmStr.equals("Breadth First Search")) {
             algorithm = new BreadthFirstSearch(mazeSurface, start, goal);
+        } else if (algorithmStr.equals("A*")) {
+            algorithm = new AStarSearch(mazeSurface, start, goal);
         }
 
         mazeSurface.setAlgorithm(algorithm);
