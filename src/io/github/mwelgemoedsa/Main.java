@@ -4,15 +4,18 @@ import com.sun.corba.se.impl.orbutil.graph.Graph;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Dimension2D;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 import java.awt.event.ActionListener;
+import java.util.concurrent.ThreadLocalRandom;
 
 class Surface extends JPanel implements ActionListener {
+
+    public PathfindingAlgorithm getAlgorithm() {
+        return algorithm;
+    }
 
     private final int xSize;
 
@@ -142,8 +145,7 @@ class Surface extends JPanel implements ActionListener {
 
     private void addObstacle(int x, int y, Obstacle obstacle) {
         Coordinate coordinate = new Coordinate(x, y);
-        System.out.println("New obstacle " + coordinate.toString());
-        obstaclesMap.put(coordinate, obstacle);
+        addObstacle(coordinate, obstacle);
     }
 
     @Override
@@ -163,26 +165,83 @@ class Surface extends JPanel implements ActionListener {
         this.repaint();
     }
 
+    //Uses the recursive division method
     void fillMaze() {
         clear();
 
+        divideChamber(0, xSize-1,0, ySize-1);
+        this.repaint();
+    }
+
+    private void divideChamber(int startX, int stopX, int startY, int stopY) {
+        int minimumWidth = 3;
+        if (stopX - startX +1 < minimumWidth || stopY - startY+1 < minimumWidth) { //Too small to divide
+            return;
+        }
+
+        //Make four perpendicular walls that meet perpendicularly at a random point
+        int divideX = startX+1;
+        if (startX+1 < stopX-1) {
+            divideX = ThreadLocalRandom.current().nextInt(startX+1, stopX-1);
+        }
+        int divideY = startY+1;
+        if (startY+1 < stopY-1) {
+            divideY = ThreadLocalRandom.current().nextInt(startY+1, stopY-1);
+        }
+        Coordinate divisionPoint = new Coordinate(divideX, divideY);
+
+        for (int x = startX; x <= stopX; x++) {
+            for (int y = startY; y <= stopY; y++) {
+                if (x == divisionPoint.getX() || y == divisionPoint.getY()) {
+                    addObstacle(x, y, Obstacle.wall);
+                }
+            }
+        }
+
+        //Calculate a random break in each wall
+        ArrayList<Coordinate> breakPoints = new ArrayList<>();
+        breakPoints.add(new Coordinate(
+                ThreadLocalRandom.current().nextInt(startX, divisionPoint.getX()),
+                divisionPoint.getY())
+        );
+
+        breakPoints.add(new Coordinate(
+                divisionPoint.getX(),
+                ThreadLocalRandom.current().nextInt(startY, divisionPoint.getY())));
+
+        breakPoints.add(new Coordinate(
+                ThreadLocalRandom.current().nextInt(divisionPoint.getX()+1, stopX+1),
+                divisionPoint.getY()));
+
+        breakPoints.add(new Coordinate(divisionPoint.getX(),
+                ThreadLocalRandom.current().nextInt(divisionPoint.getY()+1, stopY+1)));
+
+        //Take a random three
+        Collections.shuffle(breakPoints);
+        for (int i = 0; i < 3; i++) {
+            Coordinate breakPoint = breakPoints.get(i);
+            addObstacle(breakPoint, Obstacle.nothing);
+        }
+
+        //Continue the process with the four new chambers created
+        divideChamber(startX, divisionPoint.getX()-1, startY, divisionPoint.getY()-1);
+        divideChamber(divisionPoint.getX()+1, stopX, startY, divisionPoint.getY()-1);
+        divideChamber(startX, divisionPoint.getX()-1, divisionPoint.getY()+1, stopY);
+        divideChamber(divisionPoint.getX()+1, stopX, divisionPoint.getY()+1, stopY);
+    }
+
+    private void addObstacle(Coordinate coordinate, Obstacle obstacle) {
+        //System.out.println("New obstacle " + coordinate.toString() + " " + obstacle);
+        obstaclesMap.put(coordinate, obstacle);
+    }
+
+    private void clear() {
+        obstaclesMap.clear();
         for (int x = 0; x < xSize; x++) {
             for (int y = 0; y < ySize; y++) {
                 addObstacle(x, y, Obstacle.nothing);
             }
         }
-
-        Random randomGenerator = new Random();
-
-        for(int i = 0; i != 300; i++) {
-            int x = randomGenerator.nextInt(xSize);
-            int y = randomGenerator.nextInt(ySize);
-            this.addObstacle(x, y, Obstacle.wall);
-        }
-    }
-
-    private void clear() {
-        obstaclesMap.clear();
     }
 
     public void startTimer() {
@@ -199,7 +258,7 @@ public class Main extends JFrame implements ActionListener {
     }
 
     private void initUI() {
-        mazeSurface = new Surface(25, 25);
+        mazeSurface = new Surface(50, 50);
         //mazeSurface.setPreferredSize(new Dimension(500, 500));
         add(mazeSurface);
 
@@ -214,6 +273,7 @@ public class Main extends JFrame implements ActionListener {
         ctrls.setLayout(new BoxLayout(ctrls, BoxLayout.PAGE_AXIS));
         addButton("Start");
         addButton("Step");
+        addButton("New Maze");
 
         add(ctrls, BorderLayout.LINE_END);
 
@@ -252,8 +312,14 @@ public class Main extends JFrame implements ActionListener {
         if (actionEvent.getActionCommand().equals("Start")) {
             mazeSurface.startTimer();
         }
+
         if (actionEvent.getActionCommand().equals("Step")) {
             mazeSurface.step();
+        }
+
+        if (actionEvent.getActionCommand().equals("New Maze")) {
+            mazeSurface.fillMaze();
+            mazeSurface.getAlgorithm().reset();
         }
 
         if (actionEvent.getSource() instanceof JRadioButton) {

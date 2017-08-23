@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 abstract class PathfindingAlgorithm {
     private final Coordinate goal;
+    private final Coordinate start;
 
     private Surface surface;
     ArrayList<GraphNode> openList;
@@ -14,8 +15,16 @@ abstract class PathfindingAlgorithm {
 
     PathfindingAlgorithm(Surface surface, Coordinate start, Coordinate goal) {
         this.goal = goal;
+        this.start = start;
 
         this.surface = surface;
+        this.openList = new ArrayList<>();
+        this.visitedList = new ArrayList<>();
+        this.current = new GraphNode(start, 0, heuristicValue(start), null);
+        this.openList.add(this.current);
+    }
+
+    void reset() {
         this.openList = new ArrayList<>();
         this.visitedList = new ArrayList<>();
         this.current = new GraphNode(start, 0, heuristicValue(start), null);
