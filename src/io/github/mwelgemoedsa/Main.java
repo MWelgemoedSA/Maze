@@ -174,8 +174,8 @@ class Surface extends JPanel implements ActionListener {
     }
 
     private void divideChamber(int startX, int stopX, int startY, int stopY) {
-        int minimumWidth = 3;
-        if (stopX - startX +1 < minimumWidth || stopY - startY+1 < minimumWidth) { //Too small to divide
+        int minimumWidth = 2;
+        if (stopX - startX +1 <= minimumWidth || stopY - startY+1 <= minimumWidth) { //Too small to divide
             return;
         }
 
@@ -187,6 +187,15 @@ class Surface extends JPanel implements ActionListener {
         int divideY = startY+1;
         if (startY+1 < stopY-1) {
             divideY = ThreadLocalRandom.current().nextInt(startY+1, stopY-1);
+        }
+
+        //Must divide on an odd coordinate to make the maze look nicer
+        if (divideX % 2 == 0) {
+            divideX--;
+        }
+
+        if (divideY %2 == 0) {
+            divideY--;
         }
         Coordinate divisionPoint = new Coordinate(divideX, divideY);
 
@@ -207,14 +216,18 @@ class Surface extends JPanel implements ActionListener {
 
         breakPoints.add(new Coordinate(
                 divisionPoint.getX(),
-                ThreadLocalRandom.current().nextInt(startY, divisionPoint.getY())));
+                ThreadLocalRandom.current().nextInt(startY, divisionPoint.getY()))
+        );
 
         breakPoints.add(new Coordinate(
                 ThreadLocalRandom.current().nextInt(divisionPoint.getX()+1, stopX+1),
-                divisionPoint.getY()));
+                divisionPoint.getY())
+        );
 
-        breakPoints.add(new Coordinate(divisionPoint.getX(),
-                ThreadLocalRandom.current().nextInt(divisionPoint.getY()+1, stopY+1)));
+        breakPoints.add(new Coordinate(
+                divisionPoint.getX(),
+                ThreadLocalRandom.current().nextInt(divisionPoint.getY()+1, stopY+1))
+        );
 
         //Take a random three
         Collections.shuffle(breakPoints);
@@ -258,7 +271,7 @@ public class Main extends JFrame implements ActionListener {
     }
 
     private void initUI() {
-        mazeSurface = new Surface(50, 50);
+        mazeSurface = new Surface(51, 51);
         //mazeSurface.setPreferredSize(new Dimension(500, 500));
         add(mazeSurface);
 
