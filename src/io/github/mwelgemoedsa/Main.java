@@ -1,7 +1,5 @@
 package io.github.mwelgemoedsa;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
-
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -40,7 +38,7 @@ class Surface extends JPanel implements ActionListener {
 
         this.fillMaze();
 
-        tickTimer = new Timer(150, this);
+        tickTimer = new Timer(30, this);
         //timer.start();
     }
 
@@ -116,22 +114,21 @@ class Surface extends JPanel implements ActionListener {
         }
     }
 
+    boolean withinMaze(Coordinate coordinate) {
+        return coordinate.getX() >= 0 && coordinate.getX() < xSize &&
+                coordinate.getY() >= 0 && coordinate.getY() < ySize;
+    }
+
     AbstractList<Coordinate> getNeighbours(Coordinate coordinate) {
         ArrayList<Coordinate> coordinates = new ArrayList<>();
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                if (j != 0 || i != 0) {
-                    int newX = coordinate.getX() + i;
-                    int newY = coordinate.getY() + j;
 
-                    if (newX >= 0 && newX < this.xSize && newY >= 0 && newY < this.ySize) {
-                        Coordinate newCoordinate = new Coordinate(newX, newY);
-                        if (obstaclesMap.get(newCoordinate) != Obstacle.wall)
-                            coordinates.add(newCoordinate);
-                    }
-                }
-            }
-        }
+        coordinates.add(new Coordinate(coordinate.getX(), coordinate.getY()-1));
+        coordinates.add(new Coordinate(coordinate.getX()-1, coordinate.getY()));
+        coordinates.add(new Coordinate(coordinate.getX()+1, coordinate.getY()));
+        coordinates.add(new Coordinate(coordinate.getX(), coordinate.getY()+1));
+
+        coordinates.removeIf(c -> !withinMaze(c));
+        coordinates.removeIf(c -> obstaclesMap.get(c) == Obstacle.wall);
 
         return coordinates;
     }
@@ -233,7 +230,16 @@ class Surface extends JPanel implements ActionListener {
         Collections.shuffle(breakPoints);
         for (int i = 0; i < 3; i++) {
             Coordinate breakPoint = breakPoints.get(i);
-            addObstacle(breakPoint, Obstacle.nothing);
+
+            int breakX = breakPoint.getX();
+            if (breakX % 2 != 0 && breakX != divisionPoint.getX()) {
+                breakX--;
+            }
+            int breakY = breakPoint.getY();
+            if (breakY % 2 != 0 && breakY != divisionPoint.getY()) {
+                breakY--;
+            }
+            addObstacle(breakX, breakY, Obstacle.nothing);
         }
 
         //Continue the process with the four new chambers created
