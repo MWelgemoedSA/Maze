@@ -1,12 +1,12 @@
 package io.github.mwelgemoedsa;
 
 public class GraphNode {
-    private Coordinate coordinate;
-    private Double totalCost;
-    private Double heuristicAtNode;
-    private GraphNode previous;
+    private final Coordinate coordinate;
+    private final Double totalCost;
+    private final Double heuristicAtNode;
+    private final GraphNode previous;
 
-    public GraphNode(Coordinate coordinate, double totalCost, double heuristicAtNode, GraphNode previous) {
+    GraphNode(Coordinate coordinate, double totalCost, double heuristicAtNode, GraphNode previous) {
         this.coordinate = coordinate;
         this.totalCost = totalCost;
         this.heuristicAtNode = heuristicAtNode;
@@ -28,19 +28,19 @@ public class GraphNode {
         return getCoordinate().hashCode();
     }
 
-    public Coordinate getCoordinate() {
+    Coordinate getCoordinate() {
         return coordinate;
     }
 
-    public Double getTotalCost() {
+    Double getTotalCost() {
         return totalCost;
     }
 
-    public Double getHeuristicAtNode() {
+    Double getHeuristicAtNode() {
         return heuristicAtNode;
     }
 
-    public GraphNode getPrevious() {
+    GraphNode getPrevious() {
         return previous;
     }
 }

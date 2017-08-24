@@ -1,14 +1,12 @@
 package io.github.mwelgemoedsa;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
-
 import java.util.ArrayList;
 
 abstract class PathfindingAlgorithm {
     private final Coordinate goal;
     private final Coordinate start;
 
-    private Surface surface;
+    private final Surface surface;
     ArrayList<GraphNode> openList;
     private ArrayList<GraphNode> visitedList;
     private GraphNode current;

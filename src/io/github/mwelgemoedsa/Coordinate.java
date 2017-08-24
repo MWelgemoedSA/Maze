@@ -9,11 +9,11 @@ class Coordinate {
         this.y = y;
     }
 
-    public int getX() {
+    int getX() {
         return x;
     }
 
-    public int getY() {
+    int getY() {
         return y;
     }
 
@@ -24,8 +24,7 @@ class Coordinate {
 
         Coordinate that = (Coordinate) o;
 
-        if (x != that.x) return false;
-        return y == that.y;
+        return x == that.x && y == that.y;
     }
 
     @Override

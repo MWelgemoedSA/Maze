@@ -1,8 +1,8 @@
 package io.github.mwelgemoedsa;
 
-import java.util.Collections;
+import java.util.Comparator;
 
-public class AStarSearch extends PathfindingAlgorithm {
+class AStarSearch extends PathfindingAlgorithm {
     AStarSearch(Surface surface, Coordinate start, Coordinate goal) {
         super(surface, start, goal);
     }
@@ -14,6 +14,6 @@ public class AStarSearch extends PathfindingAlgorithm {
 
     @Override
     void sortOpenList() {
-        Collections.sort(openList, (p1, p2) -> new Double(p1.getHeuristicAtNode() + p1.getTotalCost()).compareTo(p2.getHeuristicAtNode() + p2.getTotalCost()));
+        openList.sort(Comparator.comparingDouble(p -> p.getHeuristicAtNode() + p.getTotalCost()));
     }
 }

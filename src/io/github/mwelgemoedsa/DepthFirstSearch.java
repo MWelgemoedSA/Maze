@@ -1,6 +1,6 @@
 package io.github.mwelgemoedsa;
 
-public class DepthFirstSearch extends PathfindingAlgorithm {
+class DepthFirstSearch extends PathfindingAlgorithm {
     DepthFirstSearch(Surface surface, Coordinate start, Coordinate goal) {
         super(surface, start, goal);
     }

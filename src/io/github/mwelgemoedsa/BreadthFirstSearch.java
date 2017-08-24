@@ -1,8 +1,6 @@
 package io.github.mwelgemoedsa;
 
-import java.util.Collections;
-
-public class BreadthFirstSearch extends PathfindingAlgorithm {
+class BreadthFirstSearch extends PathfindingAlgorithm {
     BreadthFirstSearch(Surface surface, Coordinate start, Coordinate goal) {
         super(surface, start, goal);
     }

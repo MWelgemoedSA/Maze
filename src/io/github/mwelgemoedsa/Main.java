@@ -11,17 +11,17 @@ import java.util.concurrent.ThreadLocalRandom;
 
 class Surface extends JPanel implements ActionListener {
 
-    public PathfindingAlgorithm getAlgorithm() {
+    PathfindingAlgorithm getAlgorithm() {
         return algorithm;
     }
 
     private final int xSize;
 
-    public int getxSize() {
+    int getXSize() {
         return xSize;
     }
 
-    public int getySize() {
+    int getYSize() {
         return ySize;
     }
 
@@ -33,11 +33,11 @@ class Surface extends JPanel implements ActionListener {
 
     private boolean centerDivisionPoint = true;
 
-    public boolean isCenterDivisionPoint() {
+    boolean isCenterDivisionPoint() {
         return centerDivisionPoint;
     }
 
-    public void setCenterDivisionPoint(boolean centerDivisionPoint) {
+    void setCenterDivisionPoint(boolean centerDivisionPoint) {
         this.centerDivisionPoint = centerDivisionPoint;
     }
 
@@ -98,7 +98,7 @@ class Surface extends JPanel implements ActionListener {
     }
 
     //If fillColour is null just draw the outlines
-    void drawBlock(Graphics2D g2d, int x, int y, Color fillColour) {
+    private void drawBlock(Graphics2D g2d, int x, int y, Color fillColour) {
         Dimension2D size = this.getSize();
 
         //Calculate the maximum block size to fit all blocks in the panel
@@ -124,7 +124,7 @@ class Surface extends JPanel implements ActionListener {
         }
     }
 
-    boolean withinMaze(Coordinate coordinate) {
+    private boolean withinMaze(Coordinate coordinate) {
         return coordinate.getX() >= 0 && coordinate.getX() < xSize &&
                 coordinate.getY() >= 0 && coordinate.getY() < ySize;
     }
@@ -160,12 +160,12 @@ class Surface extends JPanel implements ActionListener {
         this.step();
     }
 
-    public void setAlgorithm(PathfindingAlgorithm algorithm) {
+    void setAlgorithm(PathfindingAlgorithm algorithm) {
         this.algorithm = algorithm;
         obstaclesMap.remove(algorithm.getGoal());
     }
 
-    public void step() {
+    void step() {
         if (this.algorithm == null) return;
 
         this.algorithm.step();
@@ -279,14 +279,14 @@ class Surface extends JPanel implements ActionListener {
         }
     }
 
-    public void startTimer() {
+    void startTimer() {
         tickTimer.start();
     }
 }
 
-public class Main extends JFrame implements ActionListener {
+class Main extends JFrame implements ActionListener {
     private Surface mazeSurface;
-    private JPanel ctrls;
+    private JPanel controlsPanel;
     private JCheckBox chbCenterBreakPoint;
 
     private Main() {
@@ -305,8 +305,8 @@ public class Main extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        ctrls = new JPanel();
-        ctrls.setLayout(new BoxLayout(ctrls, BoxLayout.PAGE_AXIS));
+        controlsPanel = new JPanel();
+        controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.PAGE_AXIS));
         addButton("Start");
         addButton("Step");
         addButton("New Maze");
@@ -317,7 +317,7 @@ public class Main extends JFrame implements ActionListener {
             JRadioButton algorithmRadioButton = new JRadioButton(algorithmStr);
             algorithmGroup.add(algorithmRadioButton);
             algorithmRadioButton.addActionListener(this);
-            ctrls.add(algorithmRadioButton);
+            controlsPanel.add(algorithmRadioButton);
             if (first) {
                 first = false;
                 algorithmRadioButton.setSelected(true);
@@ -328,14 +328,14 @@ public class Main extends JFrame implements ActionListener {
         chbCenterBreakPoint = new JCheckBox("Center chamber division point");
         chbCenterBreakPoint.setSelected(mazeSurface.isCenterDivisionPoint());
         chbCenterBreakPoint.addActionListener(this);
-        ctrls.add(chbCenterBreakPoint);
+        controlsPanel.add(chbCenterBreakPoint);
 
-        add(ctrls, BorderLayout.LINE_END);
+        add(controlsPanel, BorderLayout.LINE_END);
     }
 
     private void addButton(String text) {
         JButton btnNew = new JButton(text);
-        ctrls.add(btnNew);
+        controlsPanel.add(btnNew);
         btnNew.addActionListener(this);
     }
 
@@ -373,7 +373,7 @@ public class Main extends JFrame implements ActionListener {
         }
      }
 
-    public String[] getAlgorithms() {
+    private String[] getAlgorithms() {
         return new String[]{"A*", "Greedy Search", "Depth First Search", "Breadth First Search"};
     }
 
@@ -381,17 +381,22 @@ public class Main extends JFrame implements ActionListener {
         System.out.println("New algorithm " + algorithmStr);
 
         Coordinate start = new Coordinate(0, 0);
-        Coordinate goal = new Coordinate(mazeSurface.getxSize()-1, mazeSurface.getySize()-1);
+        Coordinate goal = new Coordinate(mazeSurface.getXSize()-1, mazeSurface.getYSize()-1);
 
         PathfindingAlgorithm algorithm = null;
-        if (algorithmStr.equals("Greedy Search")) {
-            algorithm = new GreedySearch(mazeSurface, start, goal);
-        } else if (algorithmStr.equals("Depth First Search")) {
-            algorithm = new DepthFirstSearch(mazeSurface, start, goal);
-        } else if (algorithmStr.equals("Breadth First Search")) {
-            algorithm = new BreadthFirstSearch(mazeSurface, start, goal);
-        } else if (algorithmStr.equals("A*")) {
-            algorithm = new AStarSearch(mazeSurface, start, goal);
+        switch (algorithmStr) {
+            case "Greedy Search":
+                algorithm = new GreedySearch(mazeSurface, start, goal);
+                break;
+            case "Depth First Search":
+                algorithm = new DepthFirstSearch(mazeSurface, start, goal);
+                break;
+            case "Breadth First Search":
+                algorithm = new BreadthFirstSearch(mazeSurface, start, goal);
+                break;
+            case "A*":
+                algorithm = new AStarSearch(mazeSurface, start, goal);
+                break;
         }
 
         mazeSurface.setAlgorithm(algorithm);

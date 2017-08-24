@@ -1,10 +1,8 @@
 package io.github.mwelgemoedsa;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
+import java.util.Comparator;
 
-import java.util.Collections;
-
-public class GreedySearch extends PathfindingAlgorithm {
+class GreedySearch extends PathfindingAlgorithm {
     GreedySearch(Surface surface, Coordinate start, Coordinate goal) {
         super(surface, start, goal);
     }
@@ -16,6 +14,6 @@ public class GreedySearch extends PathfindingAlgorithm {
 
     @Override
     void sortOpenList() {
-        Collections.sort(openList, (p1, p2) -> p1.getHeuristicAtNode().compareTo(p2.getHeuristicAtNode()));
+        openList.sort(Comparator.comparing(GraphNode::getHeuristicAtNode));
     } //Take the node with the best heuristic
 }
