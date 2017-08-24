@@ -15,17 +15,8 @@ class Surface extends JPanel implements ActionListener {
         return algorithm;
     }
 
-    private final int xSize;
-
-    int getXSize() {
-        return xSize;
-    }
-
-    int getYSize() {
-        return ySize;
-    }
-
-    private final int ySize;
+    private int xSize;
+    private int ySize;
     private final HashMap<Coordinate, Obstacle> obstaclesMap;
     private final Timer tickTimer;
 
@@ -166,10 +157,14 @@ class Surface extends JPanel implements ActionListener {
     }
 
     void step() {
-        if (this.algorithm == null) return;
+        if (algorithm == null) return;
 
-        this.algorithm.step();
-        this.repaint();
+        algorithm.step();
+        repaint();
+
+        if (algorithm.isFinished()) {
+            tickTimer.stop();
+        }
     }
 
     //Uses the recursive division method
@@ -282,19 +277,38 @@ class Surface extends JPanel implements ActionListener {
     void startTimer() {
         tickTimer.start();
     }
+
+    int getXSize() {
+        return xSize;
+    }
+
+    int getYSize() {
+        return ySize;
+    }
+
+    void setxSize(int xSize) {
+        this.xSize = xSize;
+    }
+
+    void setySize(int ySize) {
+        this.ySize = ySize;
+    }
+
 }
 
 class Main extends JFrame implements ActionListener {
     private Surface mazeSurface;
     private JPanel controlsPanel;
     private JCheckBox chbCenterBreakPoint;
+    private JSpinner xSizeSpinner;
+    private JSpinner ySizeSpinner;
 
     private Main() {
         initUI();
     }
 
     private void initUI() {
-        mazeSurface = new Surface(51, 51);
+        mazeSurface = new Surface(31, 31);
         //mazeSurface.setPreferredSize(new Dimension(500, 500));
         add(mazeSurface);
 
@@ -327,9 +341,25 @@ class Main extends JFrame implements ActionListener {
 
         chbCenterBreakPoint = new JCheckBox("Center chamber division point");
         chbCenterBreakPoint.setSelected(mazeSurface.isCenterDivisionPoint());
-        chbCenterBreakPoint.addActionListener(this);
         controlsPanel.add(chbCenterBreakPoint);
 
+        JPanel spinnerPanel = new JPanel();
+        spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.LINE_AXIS));
+
+        xSizeSpinner = new JSpinner();
+        xSizeSpinner.setValue(mazeSurface.getXSize());
+        spinnerPanel.add(new JLabel("X Size"));
+        spinnerPanel.add(xSizeSpinner);
+        controlsPanel.add(spinnerPanel);
+
+        spinnerPanel = new JPanel();
+        spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.LINE_AXIS));
+        ySizeSpinner = new JSpinner();
+        ySizeSpinner.setValue(mazeSurface.getYSize());
+        spinnerPanel.add(new JLabel("Y Size"));
+        spinnerPanel.add(ySizeSpinner);
+        controlsPanel.add(spinnerPanel);
+        controlsPanel.add(new JSeparator());
         add(controlsPanel, BorderLayout.LINE_END);
     }
 
@@ -359,12 +389,12 @@ class Main extends JFrame implements ActionListener {
         }
 
         if (actionEvent.getActionCommand().equals("New Maze")) {
+            mazeSurface.setxSize((int)xSizeSpinner.getValue());
+            mazeSurface.setySize((int)ySizeSpinner.getValue());
+            mazeSurface.setCenterDivisionPoint(chbCenterBreakPoint.isSelected());
+            mazeSurface.getAlgorithm().setGoal(new Coordinate(mazeSurface.getXSize()-1, mazeSurface.getYSize()-1));
             mazeSurface.fillMaze();
             mazeSurface.getAlgorithm().reset();
-        }
-
-        if (actionEvent.getSource() == chbCenterBreakPoint) {
-            mazeSurface.setCenterDivisionPoint(chbCenterBreakPoint.isSelected());
         }
 
         if (actionEvent.getSource() instanceof JRadioButton) {

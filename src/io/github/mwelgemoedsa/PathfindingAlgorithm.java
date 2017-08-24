@@ -3,7 +3,7 @@ package io.github.mwelgemoedsa;
 import java.util.ArrayList;
 
 abstract class PathfindingAlgorithm {
-    private final Coordinate goal;
+    private Coordinate goal;
     private final Coordinate start;
 
     private final Surface surface;
@@ -38,9 +38,7 @@ abstract class PathfindingAlgorithm {
     }
 
     void step() {
-        if (current.getCoordinate().equals(goal)) return; //Nothing more to do
-
-        if (openList.isEmpty()) return; //Also nothing to do, unable to find it
+        if (isFinished()) return;
 
         this.sortOpenList();
 
@@ -75,5 +73,13 @@ abstract class PathfindingAlgorithm {
 
     Coordinate getGoal() {
         return goal;
+    }
+
+    void setGoal(Coordinate goal) {
+        this.goal = goal;
+    }
+
+    boolean isFinished() {
+        return current.getCoordinate().equals(goal) || openList.isEmpty();
     }
 }
