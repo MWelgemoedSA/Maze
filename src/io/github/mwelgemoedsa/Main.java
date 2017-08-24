@@ -31,6 +31,16 @@ class Surface extends JPanel implements ActionListener {
 
     private PathfindingAlgorithm algorithm;
 
+    private boolean centerDivisionPoint = true;
+
+    public boolean isCenterDivisionPoint() {
+        return centerDivisionPoint;
+    }
+
+    public void setCenterDivisionPoint(boolean centerDivisionPoint) {
+        this.centerDivisionPoint = centerDivisionPoint;
+    }
+
     Surface(int xSize, int ySize) {
         this.xSize = xSize;
         this.ySize = ySize;
@@ -178,12 +188,18 @@ class Surface extends JPanel implements ActionListener {
 
         //Make four perpendicular walls that meet perpendicularly at a random point
         int divideX = startX+1;
-        if (startX+1 < stopX-1) {
-            divideX = ThreadLocalRandom.current().nextInt(startX+1, stopX-1);
-        }
         int divideY = startY+1;
-        if (startY+1 < stopY-1) {
-            divideY = ThreadLocalRandom.current().nextInt(startY+1, stopY-1);
+
+        if (centerDivisionPoint) {
+            divideX = startX + (stopX - startX)/2;
+            divideY = startY + (stopY - startY)/2;
+        } else {
+            if (startX + 1 < stopX - 1) {
+                divideX = ThreadLocalRandom.current().nextInt(startX + 1, stopX - 1);
+            }
+            if (startY + 1 < stopY - 1) {
+                divideY = ThreadLocalRandom.current().nextInt(startY + 1, stopY - 1);
+            }
         }
 
         //Must divide on an odd coordinate to make the maze look nicer
@@ -271,6 +287,7 @@ class Surface extends JPanel implements ActionListener {
 public class Main extends JFrame implements ActionListener {
     private Surface mazeSurface;
     private JPanel ctrls;
+    private JCheckBox chbCenterBreakPoint;
 
     private Main() {
         initUI();
@@ -294,8 +311,6 @@ public class Main extends JFrame implements ActionListener {
         addButton("Step");
         addButton("New Maze");
 
-        add(ctrls, BorderLayout.LINE_END);
-
         boolean first = true;
         ButtonGroup algorithmGroup = new ButtonGroup();
         for (String algorithmStr : getAlgorithms()) {
@@ -309,6 +324,13 @@ public class Main extends JFrame implements ActionListener {
                 setAlgorithm(algorithmStr);
             }
         }
+
+        chbCenterBreakPoint = new JCheckBox("Center chamber division point");
+        chbCenterBreakPoint.setSelected(mazeSurface.isCenterDivisionPoint());
+        chbCenterBreakPoint.addActionListener(this);
+        ctrls.add(chbCenterBreakPoint);
+
+        add(ctrls, BorderLayout.LINE_END);
     }
 
     private void addButton(String text) {
@@ -339,6 +361,10 @@ public class Main extends JFrame implements ActionListener {
         if (actionEvent.getActionCommand().equals("New Maze")) {
             mazeSurface.fillMaze();
             mazeSurface.getAlgorithm().reset();
+        }
+
+        if (actionEvent.getSource() == chbCenterBreakPoint) {
+            mazeSurface.setCenterDivisionPoint(chbCenterBreakPoint.isSelected());
         }
 
         if (actionEvent.getSource() instanceof JRadioButton) {
