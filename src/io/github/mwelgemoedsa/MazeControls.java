@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 
 public class MazeControls {
-    private final Surface mazeSurface;
+    private final MazeDrawingSurface mazeSurface;
     private JPanel pnlOptions;
     private JPanel pnlAlgorithms;
     private JPanel pnlSize;
@@ -20,7 +20,7 @@ public class MazeControls {
     private JButton btnNewMaze;
     private JCheckBox chbForceSingleSolution;
 
-    MazeControls(Surface mazeSurface) {
+    MazeControls(MazeDrawingSurface mazeSurface) {
         this.mazeSurface = mazeSurface;
         btnNewMaze.addActionListener(actionEvent -> newMaze());
 
@@ -37,34 +37,39 @@ public class MazeControls {
     }
 
     private void setAlgorithm() {
+        MazeHandler mazeHandler = mazeSurface.getMazeHandler();
+
         Coordinate start = new Coordinate(0, 0);
-        Coordinate goal = new Coordinate(mazeSurface.getXSize()-1, mazeSurface.getYSize()-1);
+        Coordinate goal = new Coordinate(mazeHandler.getXSize()-1, mazeHandler.getYSize()-1);
 
         PathfindingAlgorithm algorithm = null;
 
         if (rdbGreedySearch.isSelected())
-                algorithm = new GreedySearch(mazeSurface, start, goal);
+                algorithm = new GreedySearch(mazeHandler, start, goal);
 
         if (rdbDepthFirstSearch.isSelected())
-                algorithm = new DepthFirstSearch(mazeSurface, start, goal);
+                algorithm = new DepthFirstSearch(mazeHandler, start, goal);
 
         if (rdbBreadthFirstSearch.isSelected())
-                algorithm = new BreadthFirstSearch(mazeSurface, start, goal);
+                algorithm = new BreadthFirstSearch(mazeHandler, start, goal);
 
         if (rdbAStar.isSelected())
-                algorithm = new AStarSearch(mazeSurface, start, goal);
+                algorithm = new AStarSearch(mazeHandler, start, goal);
 
         mazeSurface.setAlgorithm(algorithm);
     }
 
     void newMaze() {
-        mazeSurface.setXSize((int)spnXSize.getValue());
-        mazeSurface.setYSize((int)spnYSize.getValue());
-        mazeSurface.setCenterDivisionPoint(chbCenterDivisionPoint.isSelected());
-        mazeSurface.setForceSingleSolution(chbForceSingleSolution.isSelected());
+        MazeHandler mazeHandler = mazeSurface.getMazeHandler();
+
+        mazeHandler.setXSize((int)spnXSize.getValue());
+        mazeHandler.setYSize((int)spnYSize.getValue());
+        mazeHandler.setCenterDivisionPoint(chbCenterDivisionPoint.isSelected());
+        mazeHandler.setForceSingleSolution(chbForceSingleSolution.isSelected());
         this.setAlgorithm();
-        mazeSurface.getAlgorithm().setGoal(new Coordinate(mazeSurface.getXSize()-1, mazeSurface.getYSize()-1));
-        mazeSurface.fillMaze();
+        mazeSurface.getAlgorithm().setGoal(new Coordinate(mazeHandler.getXSize()-1, mazeHandler.getYSize()-1));
+        mazeHandler.fillMaze();
+        mazeSurface.repaint();
     }
 
     JPanel getPnlOptions() {

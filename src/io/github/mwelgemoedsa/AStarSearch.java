@@ -3,8 +3,8 @@ package io.github.mwelgemoedsa;
 import java.util.Comparator;
 
 class AStarSearch extends PathfindingAlgorithm {
-    AStarSearch(Surface surface, Coordinate start, Coordinate goal) {
-        super(surface, start, goal);
+    AStarSearch(MazeHandler maze, Coordinate start, Coordinate goal) {
+        super(maze, start, goal);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package io.github.mwelgemoedsa;
 
 class BreadthFirstSearch extends PathfindingAlgorithm {
-    BreadthFirstSearch(Surface surface, Coordinate start, Coordinate goal) {
-        super(surface, start, goal);
+    BreadthFirstSearch(MazeHandler maze, Coordinate start, Coordinate goal) {
+        super(maze, start, goal);
     }
 
     //Adding a node at the end of the open list makes it breadth first search

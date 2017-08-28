@@ -1,8 +1,8 @@
 package io.github.mwelgemoedsa;
 
 class DepthFirstSearch extends PathfindingAlgorithm {
-    DepthFirstSearch(Surface surface, Coordinate start, Coordinate goal) {
-        super(surface, start, goal);
+    DepthFirstSearch(MazeHandler maze, Coordinate start, Coordinate goal) {
+        super(maze, start, goal);
     }
 
     @Override

@@ -5,15 +5,15 @@ import java.util.ArrayList;
 abstract class PathfindingAlgorithm {
     private Coordinate goal;
 
-    private final Surface surface;
+    private final MazeHandler maze;
     ArrayList<GraphNode> openList;
     private ArrayList<GraphNode> visitedList;
     private GraphNode current;
 
-    PathfindingAlgorithm(Surface surface, Coordinate start, Coordinate goal) {
+    PathfindingAlgorithm(MazeHandler maze, Coordinate start, Coordinate goal) {
         this.goal = goal;
 
-        this.surface = surface;
+        this.maze = maze;
         this.openList = new ArrayList<>();
         this.visitedList = new ArrayList<>();
         this.current = new GraphNode(start, 0, heuristicValue(start), null);
@@ -41,7 +41,7 @@ abstract class PathfindingAlgorithm {
 
         visitedList.add(current);
 
-        for (Coordinate coordinate : surface.getNeighbours(current.getCoordinate())) {
+        for (Coordinate coordinate : maze.getNeighbours(current.getCoordinate())) {
             double stepSize = coordinate.distTo(current.getCoordinate());
             GraphNode node = new GraphNode(coordinate, current.getTotalCost() + stepSize, heuristicValue(coordinate), current);
 
