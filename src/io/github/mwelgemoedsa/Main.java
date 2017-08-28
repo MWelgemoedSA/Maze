@@ -26,10 +26,6 @@ class Surface extends JPanel implements ActionListener {
 
     private boolean forceSingleSolution = true;
 
-    boolean isCenterDivisionPoint() {
-        return centerDivisionPoint;
-    }
-
     void setCenterDivisionPoint(boolean centerDivisionPoint) {
         this.centerDivisionPoint = centerDivisionPoint;
     }
@@ -292,38 +288,32 @@ class Surface extends JPanel implements ActionListener {
         return ySize;
     }
 
-    void setxSize(int xSize) {
+    void setXSize(int xSize) {
         this.xSize = xSize;
     }
 
-    void setySize(int ySize) {
+    void setYSize(int ySize) {
         this.ySize = ySize;
     }
 
-    public boolean isForceSingleSolution() {
+    private boolean isForceSingleSolution() {
         return forceSingleSolution;
     }
 
-    public void setForceSingleSolution(boolean forceSingleSolution) {
+    void setForceSingleSolution(boolean forceSingleSolution) {
         this.forceSingleSolution = forceSingleSolution;
     }
 
 }
 
 class Main extends JFrame {
-    private Surface mazeSurface;
-    private JPanel controlsPanel;
-    private JCheckBox chbCenterBreakPoint;
-    private JSpinner xSizeSpinner;
-    private JSpinner ySizeSpinner;
-    private MazeControls mazeControls;
     private Main() {
         initUI();
     }
 
     private void initUI() {
-        mazeSurface = new Surface();
-        mazeControls = new MazeControls(mazeSurface);
+        Surface mazeSurface = new Surface();
+        MazeControls mazeControls = new MazeControls(mazeSurface);
         mazeControls.newMaze();
         add(mazeSurface);
 

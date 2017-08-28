@@ -1,7 +1,6 @@
 package io.github.mwelgemoedsa;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MazeControls {
@@ -23,33 +22,14 @@ public class MazeControls {
 
     MazeControls(Surface mazeSurface) {
         this.mazeSurface = mazeSurface;
-        btnNewMaze.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                newMaze();
-            }
-        });
+        btnNewMaze.addActionListener(actionEvent -> newMaze());
 
-        btnStart.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                mazeSurface.startTimer();
-            }
-        });
+        btnStart.addActionListener(actionEvent -> mazeSurface.startTimer());
 
-        btnStep.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                mazeSurface.step();
-            }
-        });
+        btnStep.addActionListener(actionEvent -> mazeSurface.step());
 
-        ActionListener listener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                setAlgorithm();
-            }
-        };
+        ActionListener listener = actionEvent -> setAlgorithm();
+
         rdbAStar.addActionListener(listener);
         rdbGreedySearch.addActionListener(listener);
         rdbDepthFirstSearch.addActionListener(listener);
@@ -78,8 +58,8 @@ public class MazeControls {
     }
 
     void newMaze() {
-        mazeSurface.setxSize((int)spnXSize.getValue());
-        mazeSurface.setySize((int)spnYSize.getValue());
+        mazeSurface.setXSize((int)spnXSize.getValue());
+        mazeSurface.setYSize((int)spnYSize.getValue());
         mazeSurface.setCenterDivisionPoint(chbCenterDivisionPoint.isSelected());
         mazeSurface.setForceSingleSolution(chbForceSingleSolution.isSelected());
         this.setAlgorithm();
