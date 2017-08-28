@@ -24,6 +24,8 @@ class Surface extends JPanel implements ActionListener {
 
     private boolean centerDivisionPoint = true;
 
+    private boolean forceSingleSolution = true;
+
     boolean isCenterDivisionPoint() {
         return centerDivisionPoint;
     }
@@ -32,12 +34,10 @@ class Surface extends JPanel implements ActionListener {
         this.centerDivisionPoint = centerDivisionPoint;
     }
 
-    Surface(int xSize, int ySize) {
-        this.xSize = xSize;
-        this.ySize = ySize;
+    Surface() {
+        xSize = 0;
+        ySize = 0;
         this.obstaclesMap = new HashMap<>();
-
-        this.fillMaze();
 
         tickTimer = new Timer(30, this);
         //timer.start();
@@ -172,6 +172,7 @@ class Surface extends JPanel implements ActionListener {
         clear();
 
         divideChamber(0, xSize-1,0, ySize-1);
+        this.setPreferredSize(new Dimension(xSize * 10, ySize * 10));
         this.repaint();
     }
 
@@ -239,7 +240,12 @@ class Surface extends JPanel implements ActionListener {
 
         //Take a random three
         Collections.shuffle(breakPoints);
-        for (int i = 0; i < 3; i++) {
+        int breakCount = 4;
+
+        if (isForceSingleSolution())
+            breakCount = 3;
+
+        for (int i = 0; i < breakCount; i++) {
             Coordinate breakPoint = breakPoints.get(i);
 
             int breakX = breakPoint.getX();
@@ -294,143 +300,46 @@ class Surface extends JPanel implements ActionListener {
         this.ySize = ySize;
     }
 
+    public boolean isForceSingleSolution() {
+        return forceSingleSolution;
+    }
+
+    public void setForceSingleSolution(boolean forceSingleSolution) {
+        this.forceSingleSolution = forceSingleSolution;
+    }
+
 }
 
-class Main extends JFrame implements ActionListener {
+class Main extends JFrame {
     private Surface mazeSurface;
     private JPanel controlsPanel;
     private JCheckBox chbCenterBreakPoint;
     private JSpinner xSizeSpinner;
     private JSpinner ySizeSpinner;
-
+    private MazeControls mazeControls;
     private Main() {
         initUI();
     }
 
     private void initUI() {
-        mazeSurface = new Surface(31, 31);
-        //mazeSurface.setPreferredSize(new Dimension(500, 500));
+        mazeSurface = new Surface();
+        mazeControls = new MazeControls(mazeSurface);
+        mazeControls.newMaze();
         add(mazeSurface);
-
-        mazeSurface.fillMaze();
 
         setTitle("Maze drawer");
         setSize(600, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        controlsPanel = new JPanel();
-        controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.PAGE_AXIS));
-        addButton("Start");
-        addButton("Step");
-        addButton("New Maze");
-
-        boolean first = true;
-        ButtonGroup algorithmGroup = new ButtonGroup();
-        for (String algorithmStr : getAlgorithms()) {
-            JRadioButton algorithmRadioButton = new JRadioButton(algorithmStr);
-            algorithmGroup.add(algorithmRadioButton);
-            algorithmRadioButton.addActionListener(this);
-            controlsPanel.add(algorithmRadioButton);
-            if (first) {
-                first = false;
-                algorithmRadioButton.setSelected(true);
-                setAlgorithm(algorithmStr);
-            }
-        }
-
-        chbCenterBreakPoint = new JCheckBox("Center chamber division point");
-        chbCenterBreakPoint.setSelected(mazeSurface.isCenterDivisionPoint());
-        controlsPanel.add(chbCenterBreakPoint);
-
-        JPanel spinnerPanel = new JPanel();
-        spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.LINE_AXIS));
-
-        xSizeSpinner = new JSpinner();
-        xSizeSpinner.setValue(mazeSurface.getXSize());
-        spinnerPanel.add(new JLabel("X Size"));
-        spinnerPanel.add(xSizeSpinner);
-        controlsPanel.add(spinnerPanel);
-
-        spinnerPanel = new JPanel();
-        spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.LINE_AXIS));
-        ySizeSpinner = new JSpinner();
-        ySizeSpinner.setValue(mazeSurface.getYSize());
-        spinnerPanel.add(new JLabel("Y Size"));
-        spinnerPanel.add(ySizeSpinner);
-        controlsPanel.add(spinnerPanel);
-        controlsPanel.add(new JSeparator());
-        add(controlsPanel, BorderLayout.LINE_END);
-    }
-
-    private void addButton(String text) {
-        JButton btnNew = new JButton(text);
-        controlsPanel.add(btnNew);
-        btnNew.addActionListener(this);
+        add(mazeControls.getPnlOptions(), BorderLayout.LINE_END);
+        this.pack();
     }
 
     public static void main(String[] args) {
-
         EventQueue.invokeLater(() -> {
             Main ex = new Main();
             ex.setVisible(true);
         });
     }
-
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        System.out.println(actionEvent);
-        if (actionEvent.getActionCommand().equals("Start")) {
-            mazeSurface.startTimer();
-        }
-
-        if (actionEvent.getActionCommand().equals("Step")) {
-            mazeSurface.step();
-        }
-
-        if (actionEvent.getActionCommand().equals("New Maze")) {
-            mazeSurface.setxSize((int)xSizeSpinner.getValue());
-            mazeSurface.setySize((int)ySizeSpinner.getValue());
-            mazeSurface.setCenterDivisionPoint(chbCenterBreakPoint.isSelected());
-            mazeSurface.getAlgorithm().setGoal(new Coordinate(mazeSurface.getXSize()-1, mazeSurface.getYSize()-1));
-            mazeSurface.fillMaze();
-            mazeSurface.getAlgorithm().reset();
-        }
-
-        if (actionEvent.getSource() instanceof JRadioButton) {
-            JRadioButton source = (JRadioButton)actionEvent.getSource();
-            setAlgorithm(source.getText());
-        }
-     }
-
-    private String[] getAlgorithms() {
-        return new String[]{"A*", "Greedy Search", "Depth First Search", "Breadth First Search"};
-    }
-
-    private void setAlgorithm(String algorithmStr) {
-        System.out.println("New algorithm " + algorithmStr);
-
-        Coordinate start = new Coordinate(0, 0);
-        Coordinate goal = new Coordinate(mazeSurface.getXSize()-1, mazeSurface.getYSize()-1);
-
-        PathfindingAlgorithm algorithm = null;
-        switch (algorithmStr) {
-            case "Greedy Search":
-                algorithm = new GreedySearch(mazeSurface, start, goal);
-                break;
-            case "Depth First Search":
-                algorithm = new DepthFirstSearch(mazeSurface, start, goal);
-                break;
-            case "Breadth First Search":
-                algorithm = new BreadthFirstSearch(mazeSurface, start, goal);
-                break;
-            case "A*":
-                algorithm = new AStarSearch(mazeSurface, start, goal);
-                break;
-        }
-
-        mazeSurface.setAlgorithm(algorithm);
-    }
-
-
 }
