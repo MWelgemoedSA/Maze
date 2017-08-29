@@ -1,6 +1,6 @@
 package io.github.mwelgemoedsa;
 
-public class GraphNode {
+class GraphNode {
     private final Coordinate coordinate;
     private final Double totalCost;
     private final Double heuristicAtNode;

@@ -3,7 +3,7 @@ package io.github.mwelgemoedsa;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 
-public class MazeControls {
+class MazeControls {
     private final MazeDrawingSurface mazeSurface;
     private JPanel pnlOptions;
     private JPanel pnlAlgorithms;

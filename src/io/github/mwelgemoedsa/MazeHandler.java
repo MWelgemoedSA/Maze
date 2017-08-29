@@ -1,16 +1,12 @@
 package io.github.mwelgemoedsa;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.geom.Dimension2D;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MazeHandler {
+class MazeHandler {
     private int xSize;
     private int ySize;
     private boolean centerDivisionPoint = true;

@@ -6,8 +6,8 @@ abstract class PathfindingAlgorithm {
     private Coordinate goal;
 
     private final MazeHandler maze;
-    ArrayList<GraphNode> openList;
-    private ArrayList<GraphNode> visitedList;
+    final ArrayList<GraphNode> openList;
+    private final ArrayList<GraphNode> visitedList;
     private GraphNode current;
 
     PathfindingAlgorithm(MazeHandler maze, Coordinate start, Coordinate goal) {

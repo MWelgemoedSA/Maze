@@ -2,11 +2,6 @@ package io.github.mwelgemoedsa;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.Timer;
-import java.awt.event.ActionEvent;
-import java.awt.geom.Dimension2D;
-import java.util.*;
-import java.awt.event.ActionListener;
 
 class Main extends JFrame {
     private Main() {

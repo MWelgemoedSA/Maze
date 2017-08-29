@@ -9,7 +9,7 @@ import java.awt.geom.Dimension2D;
 class MazeDrawingSurface extends JPanel implements ActionListener {
     private final Timer tickTimer;
     private PathfindingAlgorithm algorithm;
-    private MazeHandler mazeHandler;
+    private final MazeHandler mazeHandler;
 
     MazeDrawingSurface(MazeHandler mazeHandler) {
         this.mazeHandler = mazeHandler;
@@ -123,7 +123,7 @@ class MazeDrawingSurface extends JPanel implements ActionListener {
         tickTimer.start();
     }
 
-    public MazeHandler getMazeHandler() {
+    MazeHandler getMazeHandler() {
         return mazeHandler;
     }
 

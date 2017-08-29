@@ -22,7 +22,7 @@
             </constraints>
             <properties>
               <selected value="true"/>
-              <text value="A*"/>
+              <text resource-bundle="strings" key="AStar"/>
             </properties>
           </component>
           <component id="86bd3" class="javax.swing.JRadioButton" binding="rdbGreedySearch">
@@ -30,7 +30,7 @@
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Greedy Search"/>
+              <text resource-bundle="strings" key="greedy.search"/>
             </properties>
           </component>
           <component id="20a9e" class="javax.swing.JRadioButton" binding="rdbDepthFirstSearch">
@@ -38,7 +38,7 @@
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Depth First Search"/>
+              <text resource-bundle="strings" key="depth.first.search"/>
             </properties>
           </component>
           <component id="36f2b" class="javax.swing.JRadioButton" binding="rdbBreadthFirstSearch">
@@ -46,7 +46,7 @@
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Breadth First Search"/>
+              <text resource-bundle="strings" key="breadth.first.search"/>
             </properties>
           </component>
         </children>
@@ -77,7 +77,7 @@
             </constraints>
             <properties>
               <labelFor value="db808"/>
-              <text value="X Size"/>
+              <text resource-bundle="strings" key="x.size"/>
             </properties>
           </component>
           <component id="77d71" class="javax.swing.JLabel">
@@ -86,7 +86,7 @@
             </constraints>
             <properties>
               <labelFor value="af7ba"/>
-              <text value="Y Size"/>
+              <text resource-bundle="strings" key="y.size"/>
             </properties>
           </component>
         </children>
@@ -107,8 +107,8 @@
         </constraints>
         <properties>
           <selected value="false"/>
-          <text value="Center chamber division point"/>
-          <toolTipText value="Makes for better looking mazes"/>
+          <text resource-bundle="strings" key="center.chamber.division.point"/>
+          <toolTipText resource-bundle="strings" key="makes.for.better.looking.mazes"/>
         </properties>
       </component>
       <component id="c2be6" class="javax.swing.JButton" binding="btnStart">
@@ -116,7 +116,7 @@
           <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Start"/>
+          <text resource-bundle="strings" key="start"/>
         </properties>
       </component>
       <component id="92ef2" class="javax.swing.JButton" binding="btnStep">
@@ -124,7 +124,7 @@
           <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Step"/>
+          <text resource-bundle="strings" key="step"/>
         </properties>
       </component>
       <component id="a5fef" class="javax.swing.JButton" binding="btnNewMaze">
@@ -132,7 +132,7 @@
           <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="New Maze"/>
+          <text resource-bundle="strings" key="new.maze"/>
         </properties>
       </component>
       <component id="4af" class="javax.swing.JCheckBox" binding="chbForceSingleSolution">
@@ -141,8 +141,8 @@
         </constraints>
         <properties>
           <selected value="false"/>
-          <text value="Force single solution"/>
-          <toolTipText value="Force there to be only one correct solution for the maze"/>
+          <text resource-bundle="strings" key="force.single.solution"/>
+          <toolTipText resource-bundle="strings" key="force.there.to.be.only.one.correct.solution.for.the.maze"/>
         </properties>
       </component>
     </children>
