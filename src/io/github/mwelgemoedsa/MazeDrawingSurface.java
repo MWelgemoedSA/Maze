@@ -19,7 +19,9 @@ class MazeDrawingSurface extends JPanel implements ActionListener {
     private void doDrawing(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         Dimension2D size = this.getSize();
-        g2d.clearRect(0, 0, (int)size.getWidth(), (int)size.getHeight());
+
+        g2d.setColor(getBackground());
+        g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         for (int x = 0; x < mazeHandler.getXSize(); x++) {
             for (int y = 0; y < mazeHandler.getYSize(); y++) {

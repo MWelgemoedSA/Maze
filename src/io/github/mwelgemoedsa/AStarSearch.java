@@ -9,7 +9,7 @@ class AStarSearch extends PathfindingAlgorithm {
 
     @Override
     void addNode(GraphNode node) {
-        openList.add(node);
+        openList.add(0, node);
     }
 
     @Override
