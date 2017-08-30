@@ -40,7 +40,7 @@ class MazeDrawingSurface extends JPanel implements ActionListener {
         Coordinate goal = algorithm.getGoal();
         drawBlock(g2d, goal.getX(), goal.getY(), Color.GREEN);
 
-        for (GraphNode node: algorithm.getVisitedList()) {
+        for (GraphNode node: algorithm.getVisitedSet()) {
             Coordinate coordinate = node.getCoordinate();
             drawBlock(g2d, coordinate.getX(), coordinate.getY(), Color.BLUE);
         }

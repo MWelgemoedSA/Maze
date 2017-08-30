@@ -1,6 +1,6 @@
 package io.github.mwelgemoedsa;
 
-import java.util.Comparator;
+import java.util.ListIterator;
 
 class AStarSearch extends PathfindingAlgorithm {
     AStarSearch(MazeHandler maze, Coordinate start, Coordinate goal) {
@@ -9,11 +9,16 @@ class AStarSearch extends PathfindingAlgorithm {
 
     @Override
     void addNode(GraphNode node) {
-        openList.add(0, node);
-    }
-
-    @Override
-    void sortOpenList() {
-        openList.sort(Comparator.comparingDouble(p -> p.getHeuristicAtNode() + p.getTotalCost()));
+        ListIterator<GraphNode> itr = openList.listIterator();
+        while(itr.hasNext()) {
+            GraphNode current = itr.next();
+            double myAStar = node.getHeuristicAtNode() + node.getTotalCost();
+            double nodeAStar = current.getHeuristicAtNode() + current.getTotalCost();
+            if (myAStar < nodeAStar ||
+                    (myAStar == nodeAStar && node.getTotalCost() > current.getTotalCost())) {
+                break;
+            }
+        }
+        itr.add(node);
     }
 }
